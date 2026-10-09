@@ -823,7 +823,7 @@ function verifyDomain() {
     }
   }
     console.warn('BNIX domain check — current url:', href);
-    document.body.innerHTML = '<div style="color:red;padding:40px;text-align:center;font-size:18px">⚠️ 非法域名，非法钱包站点 — 拒绝交互<br><span style="font-size:13px;color:#aaa">当前地址: ' + san(href) + '</span><br><
+    document.body.innerHTML = '<div style="color:red;padding:40px;text-align:center;font-size:18px">⚠️ 非法域名，非法钱包站点 — 拒绝交互<br><span style="font-size:13px;color:#aaa">当前地址: ' + san(href) + '</span><br><span style="font-size:13px;color:#aaa">请使用官方网址</span></div>';
   throw new Error('DOMAIN NOT ALLOWED: ' + href);
 }
 
@@ -1407,7 +1407,9 @@ async function loadDirectReferrals(who) {
     for (const r of refs) {
       try {
         // mv = getModValues: [teamA, teamB, directA, directB, maxA, maxB, earnedDirect, earnedTeam]
-        //   合约质押业绩·USD 存储（stake · amount×1e18÷币价折算），并非代币数量·        // ao/bo = 该成员自身当前活跃质押本金（代币数量，activeOrder[0]），用于展示真实质押量（约 1,000,000 BNI）·        const [mv, fiRaw, aoRaw, boRaw] = await Promise.all([
+        //   合约质押业绩·USD 存储（stake · amount×1e18÷币价折算），并非代币数量·
+        // ao/bo = 该成员自身当前活跃质押本金（代笔数量，activeOrder[0]），用于展示真实质押量（约 1,000,000 BNI）·
+        const [mv, fiRaw, aoRaw, boRaw] = await Promise.all([
           VIEW.getModValues(r).catch(() => Z8()),
           VIEW.farmingInfo(r).catch(() => null),
           V.activeOrder(r, 0).catch(() => Z3()),
@@ -1555,7 +1557,7 @@ async function loadAll() {
     // Compute pending claimable yield (client-side YieldMath replica)
     try {
       let pid = parseInt($('posSel').value);
-    if (flags & 1) continue; // Active — last position
+      // Active position — last position
       if (pid >= 0) {
         const raw = await V.getPositionRaw(who, pid).catch(() => null);
         if (raw && raw[0].gt(0)) {
