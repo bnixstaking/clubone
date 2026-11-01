@@ -21,7 +21,17 @@ const POLICY = Object.freeze({
   //   await crypto.subtle.digest('SHA-256', new TextEncoder().encode(htmlText))
   //     .then(b => btoa(String.fromCharCode(...new Uint8Array(b))))
   // Leave empty array to skip HTML hash pinning (only origin enforced).
-  PINNED_HTML_HASHES: Object.freeze(['CgXT36n4N2hCljC9g6nQY9SCsTl7km5d3AcaUD6Kepc=']),
+  // ⚠️ 说明（2026-11-01）: 下面的 HTML 钉**只对根路径文档生效**（pathname 为 '/' 或
+  //   '/index.html' / '/mainindex.html'，见 isMainDoc）。本项目的现网部署都在子路径
+  //   （/bnix/、/bnixclub/、/cloud/），因此钉默认不参与校验；sub-app（/farm/）同理不受影响。
+  //   若要给子路径也开启钉，需要同时放宽 isMainDoc，并把该路径下**所有**历史版本哈希入列，
+  //   否则 CDN 缓存窗口内会有 403 风险。
+  // 2026-11-01：连接卡死修复版（RPC 硬超时 + 健康通道排序 + 连接顺序调整）。
+  //   数组第二项为修复前的旧哈希，用于缓存/回滚过渡；全网刷新后可只留第一项。
+  PINNED_HTML_HASHES: Object.freeze([
+    'CNUqe6HbT2RnIJ7DqIxQ410CZdFgqZ6iQ2x3U20Z2yU=', // 2026-11-01 连接卡死修复版
+    'CgXT36n4N2hCljC9g6nQY9SCsTl7km5d3AcaUD6Kepc='  // 上一版（过渡用，可择期删除）
+  ]),
   // How often to check for SW updates (seconds)
   UPDATE_CHECK_INTERVAL_SEC: 20
 });
